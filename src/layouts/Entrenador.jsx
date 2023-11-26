@@ -5,12 +5,12 @@ import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "../components/Navbars/AdminNavbar";
 import AdminFooter from "../components/Footers/AdminFooter";
-import Sidebar from "../components/Sidebar/EntrenadorSidebar";
+import Sidebar from "../components/Sidebar/AdminSidebar";
 import routes from "../routes";
 // Importa la imagen usando import
 import logoImg from "../assets/img/brand/logo.png";
 
-
+import {UserProvider} from "../components/Context/UserContext"
 const Entrenador = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
@@ -49,6 +49,7 @@ const Entrenador = (props) => {
   console.log(rutasFiltradas)
   return (
     <>
+    <UserProvider>
       <Sidebar
         {...props}
        
@@ -74,6 +75,7 @@ const Entrenador = (props) => {
           <AdminFooter />
         </Container>
       </div>
+      </UserProvider>
     </>
   );
 };

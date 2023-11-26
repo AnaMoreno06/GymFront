@@ -5,10 +5,11 @@ import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "../components/Navbars/AdminNavbar";
 import AdminFooter from "../components/Footers/AdminFooter";
-import Sidebar from "../components/Sidebar/AdminSidebar";
+import Sidebar from "../components/Sidebar/ClienteSidebar";
 import routes from "../routes";
 // Importa la imagen usando import
 import logoImg from "../assets/img/brand/logo.png";
+import {UserProvider} from "../components/Context/UserContext"
 
 
 const Cliente = (props) => {
@@ -44,11 +45,13 @@ const Cliente = (props) => {
     }
     return "Brand";
   };
+ 
   //Filtro las rutas para el modulo director
   const rutasFiltradas = routes.filter((ruta) => ruta.layout === "/cliente" && ruta.icon!=="")
   
   return (
     <>
+     <UserProvider>
       <Sidebar
         {...props}
        
@@ -74,6 +77,7 @@ const Cliente = (props) => {
           <AdminFooter />
         </Container>
       </div>
+      </UserProvider> 
     </>
   );
 };

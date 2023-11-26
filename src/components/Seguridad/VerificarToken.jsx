@@ -13,9 +13,9 @@ const VerificarToken = () => {
       
       if (!tieneToken) {
         if (
+          location.pathname !== "/auth/index" &&
           location.pathname !== "/auth/login" &&
-          location.pathname !== "/auth/recuperar" &&
-          location.pathname !== "/auth/registrar"
+          location.pathname !== "/auth/recuperar" 
         ) {
           navigate("/auth/login");
         }
@@ -27,4 +27,51 @@ const VerificarToken = () => {
     
   };
 
-  export {VerificarToken}
+  const VerificarRol = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const tieneToken = localStorage.getItem("token") !== null;
+  
+    useEffect(() => {
+      if (tieneToken) {
+        const usuario = JSON.parse(
+          JSON.stringify(parseJwt(localStorage.getItem("token")))
+        );
+        const numberRol = usuario.roles.length;
+        const rol1 = usuario.roles[0].nombre.split("_")[1].toLowerCase();
+        const modulo = localStorage.getItem("modulo");
+        if (numberRol > 1) {
+          const rol2 = usuario.roles[1].nombre.split("_")[1].toLowerCase();
+          if (
+            !location.pathname.includes(rol1) &&
+            !location.pathname.includes(rol2)
+          ) {
+            // localStorage.clear();
+            navigate("/" + modulo + "/index");
+          }
+        } else {
+          if (!location.pathname.includes(rol1) && numberRol === 1) {
+            //localStorage.clear();
+            navigate("/" + modulo + "/index");
+          }
+        }
+      }
+    }, [location, navigate, tieneToken]); // Aquí se eliminan los corchetes y se agrega el arreglo de dependencias
+  };
+  function parseJwt(token) {
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+  
+    return JSON.parse(jsonPayload);
+  }
+
+  export {VerificarToken,VerificarRol}

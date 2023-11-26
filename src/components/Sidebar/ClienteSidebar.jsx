@@ -27,6 +27,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import urlImagen from "../../assets/img/user.png"
+import { useUserContext } from "../Context/UserContext";
 const Sidebar = (props) => {
   const navigate = useNavigate(); 
   // Función para cerrar sesión y redirigir al usuario al login
@@ -52,22 +53,40 @@ const handleCerrarSesion = () => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
+
+  const modulo=localStorage.getItem("modulo")
+  
+  const { membresiaActiva, setMembresiaActiva} = useUserContext();
   // creates the links that appear in the left menu / Sidebar
   const createLinks = (routes) => {
-    return routes.map((prop, key) => {
-      return (
-        <NavItem key={key}>
-          <NavLink
-            to={prop.layout + prop.path}
-            tag={NavLinkRRD}
-            onClick={closeCollapse}
-          >
-            <i className={prop.icon} />
-            {prop.name}
-          </NavLink>
-        </NavItem>
-      );
-    });
+    if(membresiaActiva  ){
+      return routes.map((prop, key) => {
+        return (
+          <NavItem key={key}>
+            <NavLink
+              to={prop.layout + prop.path}
+              tag={NavLinkRRD}
+              onClick={closeCollapse}
+            >
+              <i className={prop.icon} />
+              {prop.name}
+            </NavLink>
+          </NavItem>
+        );
+      });
+    }else{
+      return (<NavItem key={1}>
+        <NavLink
+          to="/cliente/index"
+          tag={NavLinkRRD}
+          onClick={closeCollapse}
+        >
+          <i className="fas  fa-home text-blue" />
+          Index
+        </NavLink>
+      </NavItem>)
+
+    }
   };
 
   const { bgColor, routes, logo } = props;
@@ -188,7 +207,7 @@ const handleCerrarSesion = () => {
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading  text-center">UFPS</h6>
+          <h6 className="navbar-heading  text-center">ENERGY TIME</h6>
           {/* Navigation */}
         </Collapse>
       </Container>

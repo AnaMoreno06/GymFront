@@ -14,37 +14,63 @@ import {
   FormGroup,
   Label,
   Input,
+  Modal,
+  CardFooter,
+  Form,
 } from "reactstrap";
 // core components
 import Header from "../../../components/Headers/Header";
 import DataTable from "react-data-table-component";
-import { listaUsuarioRol } from "../../../api/Usuarios/Usuario";
+import { listaUsuarioRol, updateUsuario } from "../../../api/Usuarios/Usuario";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   customTheme,
   customStyles,
 } from "../../../components/Datatable/DatatableCustom";
-const Index = () => {
- 
+import { saveRecepcionista } from "../../../api/Registro/Recepcionista";
+import "../../../assets/css/spinner.css";
+import Swal from "sweetalert2";
+import { sendEmailNuevoUsuario } from "../../../api/Membresia/Membresia";
+
+const Recepcionista = () => {
+  const [recepcionistas, setRecepcionistas] = useState([]);
   const [recepcionista, setRecepcionista] = useState([]);
   const [filtro, setFiltro] = useState("");
+  //Activar spinner
+  const [downloading, setDownloading] = useState(false);
+  //Modal registrar recepcionista
+  const [modal, setModal] = useState(false);
+  const toggle = () => {
+    setRecepcionista([]);
+    setModal(!modal);
+  };
+  //Modal editar recepcionista
+  const [modalUpdate, setModalUpdate] = useState(false);
+  const toggleUpdate = () => {
+    setModalUpdate(!modalUpdate);
+  };
   const listado = async () => {
     try {
       const response = await listaUsuarioRol(4);
       const data = await response.json();
-      console.log(data);
-      setRecepcionista(data);
+      
+      setRecepcionistas(data);
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
-   listado();
+    listado();
   }, []);
 
   const columns = [
-    { name: "Id", selector: (row) => row.usuario.id, sortable: true, maxWidth: "35px" },
+    {
+      name: "Id",
+      selector: (row) => row.usuario.id,
+      sortable: true,
+      maxWidth: "35px",
+    },
     {
       name: "Nombre",
       selector: (row) => row.usuario.nombre,
@@ -74,29 +100,23 @@ const Index = () => {
     },
     {
       name: "Fecha nacimiento",
-      cell: (row) => row.usuario.fechaNacimiento,
-      selector: (row) => row.usuario.fechaNacimiento,
+      cell: (row) => row.usuario.fechaNacimiento.split("T")[0],
+      selector: (row) => row.usuario.fechaNacimiento.split("T")[0],
       sortable: true,
       wrap: true,
     },
-    
+
     {
       name: "Acciones",
       cell: (row) => (
         <div className=" d-flex justify-content-end">
-          <h3>
-            <Link className="text-primary"
-            title="Informacion">
+          <h3 onClick={() => handleOpciones(row)}>
+            <Link className="text-primary" title="Informacion">
               {" "}
               <i className="fa fa-info-circle" />
             </Link>
           </h3>
-          <h3 className="ml-4">
-            <Link className="text-success"
-            title="Resolver">
-              <i className="fa fa-arrow-right" />
-            </Link>
-          </h3>
+          
         </div>
       ),
       ignoreRowClick: true,
@@ -104,9 +124,97 @@ const Index = () => {
       button: true,
     },
   ];
+  //registrar recepcinoista
+  const registrarRecepcionista = (e) => {
+    e.preventDefault();
+    setDownloading(true);
+    saveRecepcionista(recepcionista)
+      .then((response) => response.json())
+      .then((data) => {
+        sendEmail(data.id)
+        setDownloading(false);
+        setRecepcionista([]);
+        listado();
+        toggle();
+        Swal.fire({
+          icon: "success",
+          title: "¡Completado!",
+          text: "Entrenador  registrado.",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+      .catch((err) => {
+        setDownloading(false);
+        console.log(err);
+        Swal.fire({
+          icon: "error",
+          title: "Ha ocurrido un error.",
+          text: "Por favor, intentelo mas tarde.",
+          confirmButtonText: "Aceptar",
+        });
+      });
+  };
+  //Actualizar cliente
+  const actualizarRecepcionista= (e)=>{
+    e.preventDefault();
+    setDownloading(true)
+    updateUsuario(recepcionista)
+      .then(response=>{
+        if(response.ok){
+          
+          toggleUpdate()
+          listado()
+          setDownloading(false)
+          Swal.fire({
+            icon: "success",
+            title: "¡Completado!",
+            text: "Informacion  actualizada.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
 
-const filtroProblemas=recepcionista.filter((recepcionista)=>
-recepcionista.usuario.nombre.toLowerCase().includes(filtro.toLowerCase()))
+        }else{
+          setDownloading(false)
+          Swal.fire({
+            icon: "error",
+            title: "Ha ocurrido un error.",
+            text: "Por favor, intentelo mas tarde.",
+            confirmButtonText: "Aceptar",
+          });
+        }
+      })
+      .catch(error=>{
+        console.log(error)
+        setDownloading(false)
+      })
+  }
+  //Enviar email usuario nuevo
+  const sendEmail= async(id)=>{
+    sendEmailNuevoUsuario(id)
+    .then(response=>response.json())
+    .then(data=>{
+    })
+    .catch(err=>{
+      console.log(err)
+    })
+  }
+
+   //Abrir modal y cargar entrenador
+   const handleOpciones = (entrenador) => {
+    toggleUpdate();
+    setRecepcionista(entrenador.usuario);
+  };
+  //Actualizar campos del modal
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setRecepcionista((prevRecepcionista) => ({ ...prevRecepcionista, [name]: value }));
+  };
+
+  const filtroProblemas = recepcionistas.filter((recepcionista) =>
+    recepcionista.usuario.cedula.toLowerCase().includes(filtro.toLowerCase())
+  );
 
   return (
     <>
@@ -114,75 +222,348 @@ recepcionista.usuario.nombre.toLowerCase().includes(filtro.toLowerCase()))
       {/* Page content */}
       <Container className="mt--7" fluid>
         {/* Contenido */}
-
+        {downloading && (
+          <div className="overlay">
+            <div className="spinner " aria-hidden="true"></div>
+          </div>
+        )}
         <Row>
           <Col className="mb-5 mb-xl-0" xl="12">
             <Card className="shadow">
               <CardHeader className="border-0">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h3 className="mb-0">LISTA DE RECEPCIONISTA</h3>
+                    <h3 className="mb-0">LISTA DE RECEPCIONISTAS</h3>
                   </div>
                   <div className="col text-right">
-                  <FormGroup row className="justify-content-end mr-2">
+                      <Button color="primary" type="submit" onClick={toggle}>
+                        <i className="fa fa-plus" /> Registrar
+                      </Button>
+                    
+                  </div>
+                </Row>
+                <FormGroup row className="justify-content-end mr-2 mt-3">
                   <Label for="filtro" sm={3} className="text-center">
-                    Filtrar :
+                    Buscar :
                   </Label>
                   <Col sm={9}>
-                    
                     <Input
                       type="text"
                       className=""
-                      placeholder="Buscar por Nombre..."
+                      placeholder="Buscar por Cedula..."
                       value={filtro}
                       onChange={(e) => setFiltro(e.target.value)}
                     />
                   </Col>
                 </FormGroup>
-                    {/* <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      See all
-                    </Button> */}
-                  </div>
-                </Row>
               </CardHeader>
               <CardBody>
                 <>
-                
-                <DataTable
-                  theme={customTheme}
-                  customStyles={customStyles}
-                  columns={columns}
-                  data={filtroProblemas}
-                  striped
-                  pointerOnHover
-                  responsive
-                  sortActive
-                  sortDirection
-                  highlightOnHover
-                  search // Activa la búsqueda
-                  noDataComponent="No se encontraron registros para mostrar."
-                  pagination // Activa la paginación
-                  paginationComponentOptions={{
-                    rowsPerPageText: "Filas por página:",
-                    rangeSeparatorText: "de",
-                    selectAllRowsItem: true,
-                    selectAllRowsItemText: "Todos",
-                    selectAllRowsItemShow: true,
-                  }}
-                />
+                  <DataTable
+                    theme={customTheme}
+                    customStyles={customStyles}
+                    columns={columns}
+                    data={filtroProblemas}
+                    striped
+                    pointerOnHover
+                    responsive
+                    sortActive
+                    sortDirection
+                    highlightOnHover
+                    search // Activa la búsqueda
+                    noDataComponent="No se encontraron registros para mostrar."
+                    pagination // Activa la paginación
+                    paginationComponentOptions={{
+                      rowsPerPageText: "Filas por página:",
+                      rangeSeparatorText: "de",
+                      selectAllRowsItem: true,
+                      selectAllRowsItemText: "Todos",
+                      selectAllRowsItemShow: true,
+                    }}
+                  />
                 </>
               </CardBody>
             </Card>
           </Col>
         </Row>
       </Container>
+      {/* Modal registrar recepcionista */}
+      <Modal
+        className="modal-dialog-centered"
+        size="lg"
+        isOpen={modal}
+        toggle={toggle}
+      >
+        <div className="modal-body p-0">
+          <Card className="bg-secondary shadow border-0">
+            <CardHeader className="bg-transparent pb-0 d-flex justify-content-between">
+              <div
+                className="text-muted text-center mt-2 mb-3"
+                style={{ flex: 1, textAlign: "center" }}
+              >
+                <h2>Registrar Recepcionista</h2>
+              </div>
+              <button
+                className="btn btn-close text-dark"
+                style={{
+                  backgroundColor: "transparent", // Color de fondo del botón transparente
+                  border: "none",
+                }}
+                onClick={toggle}
+              >
+                <i class="fa fa-times-circle" aria-hidden="true"></i>
+              </button>
+            </CardHeader>
+            <Form onSubmit={registrarRecepcionista}>
+              <CardBody className="px-lg-3 py-lg-2">
+                {recepcionista && (
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="nombre">
+                          Nombre's
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="nombre"
+                          name="nombre"
+                          placeholder="Marlon"
+                          value={recepcionista.nombre}
+                          onChange={handleChange}
+                          type="text"
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="email">
+                          Correo Electronico
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="email"
+                          name="email"
+                          placeholder="jesse@example.com"
+                          type="email"
+                          value={recepcionista.email}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="cedula">
+                          Cedula
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="cedula"
+                          name="cedula"
+                          placeholder="302541787"
+                          type="text"
+                          value={recepcionista.cedula}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="telefono"
+                        >
+                          Telefono
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="telefono"
+                          name="telefono"
+                          placeholder="302541787"
+                          type="text"
+                          value={recepcionista.telefono}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="fechaNacimiento"
+                        >
+                          Fecha de Nacimiento
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="fechaNacimiento"
+                          name="fechaNacimiento"
+                          type="date"
+                          value={recepcionista?.fechaNacimiento?.split("T")[0]}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                )}
+              </CardBody>
+              <CardFooter className="d-flex justify-content-between">
+                <Button className="btn-white" color="default" onClick={toggle}>
+                  Cerrar
+                </Button>
+                <Button className="text-white" color="default" type="submit">
+                  Guardar
+                </Button>
+              </CardFooter>
+            </Form>
+          </Card>
+        </div>
+      </Modal>
+      {/* Modal actulizar recepcionista */}
+      <Modal
+        className="modal-dialog-centered"
+        size="lg"
+        isOpen={modalUpdate}
+        toggle={toggleUpdate}
+      >
+        <div className="modal-body p-0">
+          <Card className="bg-secondary shadow border-0">
+            <CardHeader className="bg-transparent pb-0 d-flex justify-content-between">
+              <div
+                className="text-muted text-center mt-2 mb-3"
+                style={{ flex: 1, textAlign: "center" }}
+              >
+                <h2>Actualizar Entrenador</h2>
+              </div>
+              <button
+                className="btn btn-close text-dark"
+                style={{
+                  backgroundColor: "transparent", // Color de fondo del botón transparente
+                  border: "none",
+                }}
+                onClick={toggleUpdate}
+              >
+                <i class="fa fa-times-circle" aria-hidden="true"></i>
+              </button>
+            </CardHeader>
+            <Form onSubmit={actualizarRecepcionista}>
+              <CardBody className="px-lg-3 py-lg-2">
+                {recepcionista && (
+                  <Row>
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="nombre">
+                          Nombre's
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="nombre"
+                          name="nombre"
+                          placeholder="Marlon"
+                          value={recepcionista.nombre}
+                          onChange={handleChange}
+                          type="text"
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+
+                    <Col lg="12">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="email">
+                          Correo Electronico
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="email"
+                          name="email"
+                          placeholder="jesse@example.com"
+                          type="email"
+                          value={recepcionista.email}
+                          onChange={handleChange}
+                          disabled
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label className="form-control-label" htmlFor="cedula">
+                          Cedula
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="cedula"
+                          name="cedula"
+                          placeholder="302541787"
+                          type="text"
+                          value={recepcionista.cedula}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="telefono"
+                        >
+                          Telefono
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="telefono"
+                          name="telefono"
+                          placeholder="302541787"
+                          type="text"
+                          value={recepcionista.telefono}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col lg="4">
+                      <FormGroup>
+                        <label
+                          className="form-control-label"
+                          htmlFor="fechaNacimiento"
+                        >
+                          Fecha de Nacimiento
+                        </label>
+                        <Input
+                          className="form-control-alternative"
+                          id="fechaNacimiento"
+                          name="fechaNacimiento"
+                          type="date"
+                          value={recepcionista?.fechaNacimiento?.split("T")[0]}
+                          onChange={handleChange}
+                          required
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                )}
+              </CardBody>
+              <CardFooter className="d-flex justify-content-between">
+                <Button className="btn-white" color="default" onClick={toggleUpdate}>
+                  Cerrar
+                </Button>
+                <Button className="text-white" color="default" type="submit">
+                  Guardar
+                </Button>
+              </CardFooter>
+            </Form>
+          </Card>
+        </div>
+      </Modal>
     </>
   );
 };
 
-export default Index;
+export default Recepcionista;

@@ -11,4 +11,17 @@ async function listaUsuarioRol(rol){
     return result;
 }
 
-export {listaUsuarioRol}
+async function updateUsuario(usuario){
+    let token=localStorage.getItem("token")
+    const result=await fetch(urlBackend+"usuario/update/"+usuario.id,{
+        method:'PUT',
+        body:JSON.stringify(usuario),
+        headers:{
+            "Authorization":"Bearer "+token,
+            "Content-type":"application/json"
+        }
+    })
+    return result;
+}
+
+export {listaUsuarioRol,updateUsuario}

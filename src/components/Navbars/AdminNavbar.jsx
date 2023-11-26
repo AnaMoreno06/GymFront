@@ -32,7 +32,7 @@ const AdminNavbar = () => {
   const [nombreUser, setNombreUser] = useState("");
   useEffect(() => {
     try {
-      const nombreUsuario = JSON.parse(localStorage.getItem("data")).data.user.username;
+      const nombreUsuario = JSON.parse(localStorage.getItem("data")).nombre;
       
       setNombreUser(nombreUsuario);
     } catch (error) {
@@ -56,7 +56,7 @@ const AdminNavbar = () => {
             INICIO
           </a> */}
           <a className="btn h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-            href="https://ww2.ufps.edu.co/" target="_blank">Bienvenido</a>
+             target="_blank">Bienvenido </a>
 
           <Nav className="align-items-center d-none d-md-flex" navbar>
             <UncontrolledDropdown nav>

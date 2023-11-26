@@ -1,83 +1,27 @@
-// reactstrap components
 import React, { useState } from "react";
-// javascipt plugin for creating charts
-// react plugin used to create charts
-import { Line, Bar } from "react-chartjs-2";
 import {
   Button,
   Card,
   CardBody,
-  FormGroup,
-  Form,
-  Input,
-  InputGroup,
-  InputGroupText,
   Row,
   Col,
   CardHeader,
   CardTitle,
   Container,
-  List,
   Modal,
   CardFooter,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
 } from "reactstrap";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { iniciarSesion } from "../../api/LoginApi";
 import Carrusel from "../../components/Carousel/Carrusel";
 import ChartComponent from "../../components/Carousel/Charts";
 
 const Index = () => {
-  const navigate = useNavigate();
   const [modal, setModal] = useState(false);
 
   const toggle = () => setModal(!modal);
-  const [contraseñaIncorrecta, setContraseñaIncorrecta] = useState(false);
-  const [mensaje, setMensaje] = useState("");
+  
 
-  const handelSubmit = (e) => {
-    setContraseñaIncorrecta(false);
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const email = formData.get("email").toUpperCase();
-    const password = formData.get("password");
-
-    const usuario = {
-      usuario: email,
-      clave: password,
-    };
-    //Realizo peticion para iniciar sesion
-    iniciarSesion(usuario)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.success === true) {
-          localStorage.setItem("token", data.data.token);
-          localStorage.setItem("data", JSON.stringify(data));
-          navigate("/usuario/index");
-        } else {
-          setContraseñaIncorrecta(true);
-          setMensaje(data.data.mensaje);
-          eliminarToken();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const eliminarToken = () => {
-    // Tiempo de expiración del token en milisegundos (1800000 ms = 30 minutos)
-    const tiempoExpiracionToken = 1800000;
-    setTimeout(() => {
-      alert("se acabo su tiempo");
-      localStorage.clear();
-    }, tiempoExpiracionToken);
-  };
+  
 
   return (
     <>
@@ -117,9 +61,10 @@ const Index = () => {
                 <Row className="text-center text-blue d-block">
                   <p className="mt-3 mb-0 text-muted text-sm">
                     <span className="text-dark mr-2">
-                      Lunes a Sabado <i className="fa fa-long-arrow-right" /> 5
-                      AM - 10 PM
+                      Lunes a Viernes <i className="fa fa-long-arrow-right" /> 5:00
+                      AM - 9:00 PM
                     </span>
+                   
                   </p>
 
                   {/* <p className="mt-3 mb-0 text-muted text-sm">
@@ -130,8 +75,8 @@ const Index = () => {
                   </p> */}
                   <p className="mt-3 mb-0 text-muted text-sm">
                     <span className="text-dark mr-2">
-                      Domingo/Festivos <i className="fa fa-long-arrow-right" />{" "}
-                      8 AM - 8 PM
+                      Sabados y Festivos <i className="fa fa-long-arrow-right" />{" "}
+                      7:00 AM - 12:00 PM
                     </span>
                   </p>
                 </Row>
@@ -201,16 +146,29 @@ const Index = () => {
       >
         <div className="modal-body p-0">
           <Card className="bg-secondary shadow border-0">
-            <CardHeader className="bg-transparent pb-0">
-              <div className="text-muted text-center mt-2 mb-3">
-                <h2>Informacion de asistencia</h2>
+          <CardHeader className="bg-transparent pb-0 d-flex justify-content-between">
+              <div
+                className="text-muted text-center mt-2 mb-3"
+                style={{ flex: 1, textAlign: "center" }}
+              >
+                <h2>Tabla Asistencia</h2>
               </div>
+              <button
+                className="btn btn-close text-dark"
+                style={{
+                  backgroundColor: "transparent", // Color de fondo del botón transparente
+                  border: "none",
+                }}
+                onClick={toggle}
+              >
+                <i class="fa fa-times-circle" aria-hidden="true"></i>
+              </button>
             </CardHeader>
             <CardBody className="px-lg-3 py-lg-2">
               <ChartComponent />
             </CardBody>
             <CardFooter>
-              <div className="text-center">
+              {/* <div className="text-center">
                 <Button
                   className="my-0 text-white"
                   type="button"
@@ -219,7 +177,7 @@ const Index = () => {
                 >
                   Cerrar
                 </Button>
-              </div>
+              </div> */}
             </CardFooter>
           </Card>
         </div>

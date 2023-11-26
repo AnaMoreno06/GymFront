@@ -55,12 +55,12 @@ const AdminNavbar = () => {
                   <span className="nav-link-inner--text">Inicio</span>
                 </NavLink>
               </NavItem>
-              <NavItem>
+              {/* <NavItem>
                 <NavLink className="nav-link-icon" tag={Link}>
                   <i className="ni ni-key-25" />
                   <span className="nav-link-inner--text">Corporativo</span>
                 </NavLink>
-              </NavItem>
+              </NavItem> */}
               <NavItem>
                 <NavLink
                   className="nav-link-icon"

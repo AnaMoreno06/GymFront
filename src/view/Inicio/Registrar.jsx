@@ -14,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { saveUser } from "../../api/Registro/Usuario";
+import {  saveCliente} from "../../api/Registro/Cliente";
 import "../../assets/css/spinner.css"
 const Login = () => {
   const navigate = useNavigate();

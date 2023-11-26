@@ -9,7 +9,7 @@ import Sidebar from "../components/Sidebar/AdminSidebar";
 import routes from "../routes";
 // Importa la imagen usando import
 import logoImg from "../assets/img/brand/logo.png";
-
+import {UserProvider} from "../components/Context/UserContext"
 
 const Director = (props) => {
   const mainContent = React.useRef(null);
@@ -49,12 +49,13 @@ const Director = (props) => {
   
   return (
     <>
+    <UserProvider>
       <Sidebar
         {...props}
        
         routes={rutasFiltradas}
         logo={{
-          innerLink: "/usuario/index",
+          innerLink: "/admin/index",
           imgSrc: logoImg, // Usamos la variable importada aquí
           imgAlt: "...",
         }}
@@ -74,6 +75,7 @@ const Director = (props) => {
           <AdminFooter />
         </Container>
       </div>
+      </UserProvider>
     </>
   );
 };

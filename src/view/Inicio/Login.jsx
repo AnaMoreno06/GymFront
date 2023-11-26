@@ -20,20 +20,18 @@ const Login = () => {
   const [contraseñaIncorrecta, setContraseñaIncorrecta] = useState(false);
   const [mensaje, setMensaje] = useState("");
 
-  
   const handelSubmit = (e) => {
     setContraseñaIncorrecta(false);
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const email = formData.get("email")
+    const email = formData.get("email").toUpperCase();
     const password = formData.get("password");
 
     const usuario = {
-       email,
+      email,
       password,
     };
-    console.log(usuario)
     //Realizo peticion para iniciar sesion
     iniciarSesion(usuario)
       .then((response) => response)
@@ -45,15 +43,13 @@ const Login = () => {
           localStorage.setItem("token", token);
           localStorage.setItem("data", JSON.stringify(parseJwt(token)));
           const usuario = JSON.parse(localStorage.getItem("data"));
-          const rol = usuario.roles[0].nombre
-            .split("_")[1]
-            .toLowerCase();
+          const rol = usuario.roles[0].nombre.split("_")[1].toLowerCase();
           localStorage.setItem("modulo", rol);
           navigate("/" + rol + "/index");
         } else {
           setContraseñaIncorrecta(true);
           setMensaje("Contraseña o Email incorrecto");
-          eliminarToken()
+          //eliminarToken();
         }
       })
       .catch((err) => {
@@ -75,38 +71,42 @@ const Login = () => {
 
     return JSON.parse(jsonPayload);
   }
-  const eliminarToken=()=>{
+  const eliminarToken = () => {
     // Tiempo de expiración del token en milisegundos (1800000 ms = 30 minutos)
-const tiempoExpiracionToken = 1800000;
-    setTimeout(()=>{
-      alert("se acabo su tiempo")
-      localStorage.clear()
-    },tiempoExpiracionToken)
-  }
+    const tiempoExpiracionToken = 1800000;
+    setTimeout(() => {
+      alert("se acabo su tiempo");
+      localStorage.clear();
+    }, tiempoExpiracionToken);
+  };
 
   return (
     <>
       <Col lg="5" md="7">
-        <Card className="bg-secondary shadow  border my-2" color="dark" outline>
+        <Card className="bg-white shadow  border my-2" color="primary" outline>
           <CardBody className="px-lg-5 py-lg-5">
-            <h1 className="text-center p-3 text-dark fw-bold">
-              Iniciar Sesión
+            <h1 className="text-center  p-3 text-dark fw-bold">
+              INICIAR SESION
             </h1>
             <Form role="form" onSubmit={handelSubmit}>
               {contraseñaIncorrecta && (
                 <div
-                  className="alert bg-danger text-white text-center"
+                  className="alert bg-danger  text-white text-center"
                   role="alert"
                 >
                   {mensaje}
                 </div>
               )}
               <FormGroup className="mb-3">
+                <label className="form-control-label text-dark" htmlFor="nombre">
+                  CORREO ELECTRONICO
+                </label>
                 <InputGroup className="input-group-alternative">
                   <InputGroupText>
-                    <i className="fa fa-envelope" aria-hidden="true" />
+                    <i className="fa fa-envelope text-primary" aria-hidden="true" />
                   </InputGroupText>
                   <Input
+                    className="text-dark border"
                     placeholder="Email"
                     type="text"
                     autoComplete="new-email"
@@ -116,11 +116,15 @@ const tiempoExpiracionToken = 1800000;
                 </InputGroup>
               </FormGroup>
               <FormGroup>
+              <label className="form-control-label text-dark" htmlFor="nombre">
+                      CONTRASEÑA
+                    </label>
                 <InputGroup className="input-group-alternative">
                   <InputGroupText>
-                    <i className="fa fa-lock" aria-hidden="true" />
+                    <i className="fa fa-lock text-primary" aria-hidden="true" />
                   </InputGroupText>
                   <Input
+                  className="text-dark border "
                     placeholder="Contraseña"
                     type="password"
                     autoComplete="new-password"
@@ -131,7 +135,7 @@ const tiempoExpiracionToken = 1800000;
               </FormGroup>
               <div className="text-center">
                 <Button
-                  className="my-4 text-white fw-bold bg-gradient-primary"
+                  className="my-4 text-white fw-bold bg-primary"
                   type="submit"
                 >
                   Iniciar sesión
@@ -146,7 +150,6 @@ const tiempoExpiracionToken = 1800000;
               <small className="text-dark h5">¿Olvidaste tu contraseña?</small>
             </Link>
           </Col>
-          
         </Row>
       </Col>
     </>

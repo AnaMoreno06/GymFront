@@ -145,7 +145,7 @@ const Login = () => {
             {!emailVerificado && (
               <Form role="form" >
                 <p className="text-center ">
-                Ingresa tu correo institucional.{" "}
+                Ingresa tu correo electronico.{" "}
                 </p>
                 {errorVerificacion && ( // Muestra el mensaje de error solo si hay un error de verificación
                   <div
@@ -158,9 +158,10 @@ const Login = () => {
                 <FormGroup className="mb-3">
                   <InputGroup className="input-group-alternative">
                     <InputGroupText>
-                      <i className="fa fa-envelope" aria-hidden="true" />
+                      <i className="fa fa-envelope text-primary" aria-hidden="true" />
                     </InputGroupText>
                     <Input
+                    className="border"
                       placeholder="Email"
                       type="text"
                       autoComplete="new-email"
@@ -171,7 +172,7 @@ const Login = () => {
                 </FormGroup>
 
                 <div className="text-center">
-                  <Button className="my-4 text-white bg-gradient-primary"  type="submit">
+                  <Button className="my-4 text-white bg-primary"  type="submit">
                     Siguiente
                   </Button>
                 </div>

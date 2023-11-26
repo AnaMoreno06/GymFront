@@ -9,7 +9,7 @@ import Sidebar from "../components/Sidebar/AdminSidebar";
 import routes from "../routes";
 // Importa la imagen usando import
 import logoImg from "../assets/img/brand/logo.png";
-
+import {UserProvider} from "../components/Context/UserContext"
 
 const Recepcionista = (props) => {
   const mainContent = React.useRef(null);
@@ -49,6 +49,7 @@ const Recepcionista = (props) => {
   
   return (
     <>
+      <UserProvider>
       <Sidebar
         {...props}
        
@@ -74,6 +75,7 @@ const Recepcionista = (props) => {
           <AdminFooter />
         </Container>
       </div>
+      </UserProvider>
     </>
   );
 };

@@ -12,7 +12,7 @@ const Login = () => {
        <footer className="py-5 bg-primary text-white">
       <Container>
       <Row className="text-center justify-content-center">
-      <Col xl="5 p-5 ">
+      <Col xl="4">
             <div className="text-center text-xl-left">
             <Link to="/">
                     <img
@@ -24,6 +24,7 @@ const Login = () => {
               <p>Mejora tu salud y bienestar con nosotros.</p>
             </div>
           </Col>
+          <Col xl="8"></Col>
       </Row>
       <hr  className="bg-white"/>
         <Row className="align-items-center justify-content-xl-between">

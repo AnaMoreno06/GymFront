@@ -10,11 +10,12 @@ import UsuarioLayout from "./layouts/Admin";
 import EntrenadorLayout from "./layouts/Entrenador"
 import ClienteLayout from "./layouts/Cliente"
 import RecepcionistaLayout from "./layouts/Recepcionista"
-import { VerificarToken } from "./components/Seguridad/VerificarToken";
+import { VerificarToken ,VerificarRol} from "./components/Seguridad/VerificarToken";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      {/* <VerificarToken/> */}
+      <VerificarToken/>
+      <VerificarRol/>
       <Routes>
         <Route path="/admin/*" element={<UsuarioLayout />} />
         <Route path="/auth/*" element={<AuthLayout />} />

@@ -188,7 +188,7 @@ const handleCerrarSesion = () => {
           {/* Divider */}
           <hr className="my-3" />
           {/* Heading */}
-          <h6 className="navbar-heading  text-center">UFPS</h6>
+          <h6 className="navbar-heading  text-center">ENERGY TIME</h6>
           {/* Navigation */}
         </Collapse>
       </Container>
